@@ -543,18 +543,27 @@ When the provider supports a dedicated field, `native` mode places `outputSchema
 
 ## Appendix: preserving model reasoning
 
-The response model developed above covers answer text and tool calls. Some providers also return reasoning. The chat displays every `TextPart` as part of the answer, while reasoning must remain in the model message for later calls without being displayed. We therefore extend `ModelPart` with a distinct reasoning part.
+Almost all current agentic models use reasoning. A model works through a task before producing an answer or requesting a tool. That reasoning can contain intermediate conclusions, assumptions, and plans that are not repeated in the answer or tool call.
 
-Providers do not expose reasoning through one common format. Some return readable text or a summary. Others return opaque or encrypted data that must be supplied again on a later model call. The harness preserves that provider-owned value without assuming that it is readable or editable:
+When the tool returns its result, the model can use its earlier reasoning to continue. The same reasoning can also remain useful across user turns. For a model trained to continue with that information present, removing it changes the conditions under which it operates: earlier outputs remain in the conversation, while part of the context they depended on is gone. The model may need to reconstruct that context, repeat work, or reach a different conclusion.
+
+Our state therefore needs to preserve the reasoning information the provider makes available for later calls.
+
+Providers represent this information differently. Some expose readable reasoning; others return encrypted content or structures containing signatures. We need a common place to preserve that information while allowing its data type to vary:
 
 ```ts
-type ReasoningPart = {
+type ReasoningPart<T> = {
   type: "reasoning";
-  provider: string;
-  data: unknown;
+  data: T;
 };
 
-type ModelPart = TextPart | ToolCallPart | ReasoningPart;
+type ModelPart<T> = TextPart | ToolCallPart | ReasoningPart<T>;
 ```
 
-The adapter that created the part knows how to send it back to the same provider. The loop only preserves its position in the model message, and the generic chat ignores it. If a provider exposes readable reasoning, its adapter can expose that text separately; generic code cannot recover it from `data: unknown`.
+`T` is the reasoning data type used by the chosen model adapter. It can be a string or a structured value containing everything needed to return the reasoning on later calls. A readable summary alone is insufficient when the provider requires additional information for continuation.
+
+The model adapter converts the provider's reasoning representation into a `ReasoningPart<T>` and reconstructs the required representation when sending the conversation back. This includes preserving any signatures and associations with other response parts. The loop keeps the reasoning part in its original position in the model message without interpreting or modifying `data`.
+
+The loop already preserves the complete model response and executes only tool calls. Reasoning therefore remains in the state without requiring another branch in the loop.
+
+Presentation remains separate from preservation. The chat displays `TextPart` values as answer text. A user interface may also display readable reasoning, but showing or hiding it does not change what the harness retains for the next model call.

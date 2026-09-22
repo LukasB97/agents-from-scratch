@@ -12,7 +12,7 @@ The goal is to understand the whole system, from its smallest parts to how we wo
 | --- | --- | --- |
 | [01 · The Essence of AI Agents](blog/01_introduction.md) | How text completion becomes conversation, tool use, and an agent loop | Ready |
 | [02 · State and the Agent Loop](blog/02_agent-loop.md) | Representing a conversation and expressing the loop in TypeScript | Ready |
-| 03 · The Shell | Running programs and keeping processes available between calls | Planned |
+| [03 · The Shell](blog/03_shell.md) | Running programs and keeping processes available between calls | Ready |
 | 04 · Reading and Changing Files | Giving the agent a reliable way to inspect and edit files | Planned |
 | 05 · Streaming the Agent’s Work | Seeing responses and tool activity as they happen | Planned |
 | 06 · Persistence | Recording progress and continuing after a restart | Planned |
