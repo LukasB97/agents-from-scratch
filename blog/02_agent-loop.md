@@ -562,6 +562,8 @@ type ModelPart<T> = TextPart | ToolCallPart | ReasoningPart<T>;
 
 `T` is the reasoning data type used by the chosen model adapter. It can be a string or a structured value containing everything needed to return the reasoning on later calls. A readable summary alone is insufficient when the provider requires additional information for continuation.
 
+The type parameter `T` also passes through the message and state types, the model adapter, and the corresponding function signatures. The loop’s behavior remains unchanged.
+
 The model adapter converts the provider's reasoning representation into a `ReasoningPart<T>` and reconstructs the required representation when sending the conversation back. This includes preserving any signatures and associations with other response parts. The loop keeps the reasoning part in its original position in the model message without interpreting or modifying `data`.
 
 The loop already preserves the complete model response and executes only tool calls. Reasoning therefore remains in the state without requiring another branch in the loop.

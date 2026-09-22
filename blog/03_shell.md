@@ -203,6 +203,8 @@ Other workflows need state to survive across inputs. The agent may change a work
 
 For these workflows, we keep the shell or interpreter alive between calls. We call this a **persistent session**.
 
+The harness starts persistent shells and interpreters in interactive mode with a terminal.
+
 We add a `persistent` argument to choose this behavior. It defaults to `false`, meaning the shell exits after its command finishes. Setting it to `true` keeps the shell open for further input. The `type` argument still chooses which shell to launch.
 
 As the agent starts more executions, meaningful names can make them easier to track. We therefore also let it supply an unused handle. If it omits the handle, the harness generates one.
